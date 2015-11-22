@@ -14,25 +14,31 @@ test <- read.csv("pml-testing.csv")
 
 ##Predictor Selection
 </br>
-The assignment indicated that only the accelerometer attached to the belt, forearm, arm and dumbbell are to be used to predict how well the activities were performed. The columns were subsetted doing the following:
+The datasets were downloaded previously and placed in the project folder for this assignment.</br>
+The assignment indicated that only the accelerometer attached to the belt, forearm, arm and dumbbell are to be used to predict how well the activities were performed. The predictors were then selected by using only that had "accel" in it's name and this was found using the grep function. </br>
+The columns were subsetted doing the following:
 ```{r}
 training_s <- training[,c(grep("accel", colnames(training)),160)]
 training_sub <- training_s[,-(grep("^var", colnames(training_s)))]
 ```
-As demonstrated above, 13 columns were chosen from the dataset of 160. 12 of the columns would be used as predictors to predict the 13th, the column "Classe". The columns names beginning with var were mostly populated with "NA" values which would affect the prediction of the classe variable so therefore it was removed.
+As demonstrated above, 17 columns were chosen from the dataset of 160. 16 of the columns would be used as predictors to predict the 17th, the column "Classe". The columns names beginning with var were mostly populated with "NA" values which would affect the prediction of the classe variable so therefore it was removed.
 
 ##Exploratory Analysis
-The datasets were downloaded previously and placed in the project folder for this assignment.
+</br>
 ```{r}
 library(caret)
 qplot(accel_belt_x, colour = classe, data=training_sub, geom = "density")
+qplot(accel_forearm_x, colour = classe, data=training_sub, geom = "density")
+qplot(accel_dumbbell_x, colour = classe, data=training_sub, geom = "density")
 #do graphs
 ```
 
 
 ##Model Selection and Training
+</br>
 Before the model can be developed and trained I ensured that reproducibility is possible. I ensured that the seed was set for the overall model and also created a vector of lists, seeds, to pass to the fitControl function to ensure that every step of the model training is reproducible. </br>
-Next, the training dataset was split, 75/25, into training and validation datasets using the createDataPartition function. The variable fitControl was created using the trainCOntrol function to help with the optimizing of the train function. oob was chosen as the method, the number of folds is 10 and this should be repeated 5 times. The random forest method is used to train the model. preProcessing in the training function was left out because the accuracy was better in the random forest model without it.
+Next, the training dataset was split, 75/25, into training and validation datasets using the createDataPartition function. The variable fitControl was created using the trainCOntrol function to help with the optimizing of the train function. oob was chosen as the method, the number of folds is 10 and this should be repeated 5 times.</br> 
+Several algorithms were used for the assignment such as AdaBoost.M1 and AdaBag however the accuracy of those were very low, less than 50%. The random forest method was chosen to train the model because it was giving the best accuracy percentage. preProcessing in the training function was left out because the accuracy was better in the random forest model without it.
 
 ```{r, cache=TRUE}
 set.seed(1249)
@@ -50,4 +56,4 @@ c_mat$table
 c_mat$overall
 ```
 
-After the model was trained into the variable rfModelFit and it was tested on the validation dataset, a confusionMatrix was done with the results, ans and the actual values in training_sub$classe. The model gave an in-sample Accuracy of 95%. Therefore an out-of-sample Accuracy would be less than 95% and it's error rate would be greater than 5%.
+After the model was trained into the variable rfModelFit and it was tested on the validation dataset, a confusionMatrix was done with the results, ans and the actual values in training_sub$classe. The model gave an in-sample Accuracy of 95%. Therefore an <b>out-of-sample Accuracy</b> would be less than <b>95%</b> and it's error rate would be greater than <b>5%</b>.
